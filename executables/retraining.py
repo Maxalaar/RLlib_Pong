@@ -1,6 +1,7 @@
 import ray
 from ray.tune import Tuner
 from ray.rllib.algorithms.dqn import DQN
+from ray.rllib.algorithms.ppo import PPO
 
 import environment.environment_creator
 
