@@ -2,7 +2,8 @@ from ray.rllib.algorithms.algorithm import AlgorithmConfig, Algorithm
 import environment.environment_creator
 
 if __name__ == '__main__':
-    path_checkpoint: str = '/home/malaarabiou/Programming_Projects/Pycharm_Projects/RLlib_Pong/ray_results/DQN_2023-12-04_17-31-21/DQN_my_pong_8ee3c_00000_0_2023-12-04_17-31-21/checkpoint_002829'
+    path_checkpoint: str = '/home/malaarabiou/Programming_Projects/Pycharm_Projects/RLlib_Pong/ray_results/PPO_2023-12-01_11-48-20/PPO_ALE_Pong-v5_24b2d_00000_0_2023-12-01_11-48-20/checkpoint_000930'
+
     algorithm: Algorithm = Algorithm.from_checkpoint(path_checkpoint)
     algorithm_config: AlgorithmConfig = Algorithm.get_config(algorithm).copy(copy_frozen=False)
 
@@ -16,6 +17,6 @@ if __name__ == '__main__':
     algorithm: Algorithm = algorithm_config.build()
     algorithm.restore(path_checkpoint)
 
-    number_iteration: int = 10
+    number_iteration: int = 3
     for i in range(number_iteration):
         algorithm.evaluate()
