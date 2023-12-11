@@ -5,7 +5,8 @@ from ray import air, tune
 from ray.rllib.algorithms.dqn import DQNConfig
 from ray.rllib.algorithms.ppo import PPOConfig
 
-# import environment.environment_creator
+# import environments.environment_creator
+import models.register_model
 
 if __name__ == '__main__':
     ray.init(num_gpus=1, local_mode=False)
@@ -29,13 +30,13 @@ if __name__ == '__main__':
     algorithm_configuration = (
         # PPOConfig()
         DQNConfig()
-        # .environment("my_pong")
-        # .environment("CartPole-v1")
+        # .environments('my_pong')
+        # .environments("CartPole-v1")
         .environment('ALE/Pong-v5')
         .rollouts(num_rollout_workers=3)
         .resources(num_gpus_per_worker=0.1, num_gpus_per_learner_worker=0.1, num_gpus=0.5)
         .framework('torch')
-        .training(model={'fcnet_hiddens': [64, 64]})    # , "framestack": True
+        .training(model={'custom_model': 'custom_cnn'})     # 'fcnet_hiddens': [256, 256], "conv_filters": [[16, [4, 4], 2], [32, [4, 4], 2], [512, [11, 11], 1]],
         .evaluation(evaluation_num_workers=1)
     )
     # For Rainbow
@@ -49,7 +50,7 @@ if __name__ == '__main__':
         trainable='DQN',    # or 'PPO'
         param_space=algorithm_configuration,
         run_config=air.RunConfig(
-            storage_path='/home/malaarabiou/Programming_Projects/Pycharm_Projects/RLlib_Pong/debug/ray_debug',
+            storage_path='/home/malaarabiou/Programming_Projects/Pycharm_Projects/RLlib_Pong/debug/ray_results',
             # storage_path='/home/malaarabiou/Programming_Projects/Pycharm_Projects/RLlib_Pong/ray_results',
             stop={
                 # 'time_total_s': 60 * 60 * 24,

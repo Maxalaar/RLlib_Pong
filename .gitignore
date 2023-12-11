@@ -1,5 +1,7 @@
-ray_results/
-ray_videos/
-ray_dataset/
-debug/ray_debug/
-debug/trash_debug/
+/ray_results/
+/ray_videos/
+/ray_datasets/
+/debug/ray_debug/
+/debug/trash_debug/
+/debug/ray_results/
+/debug/ray_videos/

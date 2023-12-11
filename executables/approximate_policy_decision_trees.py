@@ -9,7 +9,7 @@ def load_partial_data(path, start_idx, end_idx):
         return observations, actions
 
 if __name__ == '__main__':
-    # reader = JsonReader('/home/malaarabiou/Programming_Projects/Pycharm_Projects/RLlib_Pong/ray_dataset/dataset_1/output-2023-12-06_16-26-45_worker-0_0.json')
+    # reader = JsonReader('/home/malaarabiou/Programming_Projects/Pycharm_Projects/RLlib_Pong/ray_datasets/dataset_1/output-2023-12-06_16-26-45_worker-0_0.json')
     # batch = reader.next()
 
     # plt.imshow(batch['obs'][0])
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     # plt.show()
 
     observations, actions = load_partial_data(
-        '/home/malaarabiou/Programming_Projects/Pycharm_Projects/RLlib_Pong/ray_dataset/data_1.h5',
+        '/ray_datasets/data_1.h5',
         0,
         1000,
     )

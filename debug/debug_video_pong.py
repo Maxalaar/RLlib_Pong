@@ -1,7 +1,7 @@
 import gymnasium
 from gymnasium.wrappers import RecordVideo, FrameStack
 
-from environment.environment_creator import record_video_pong_creator
+from environments.environment_creator import record_video_pong_creator
 
 if __name__ == '__main__':
     environment = record_video_pong_creator({})

@@ -7,7 +7,7 @@ if __name__ == '__main__':
     # Assuming you have an array containing 100 images with a shape of (100, 84, 84, 4)
     # Replace this with your own array of images
     observations, actions = load_partial_data(
-        '/home/malaarabiou/Programming_Projects/Pycharm_Projects/RLlib_Pong/ray_dataset/data_1.h5',
+        '/ray_datasets/data_1.h5',
         0,
         1000,
     )

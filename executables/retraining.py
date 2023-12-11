@@ -3,7 +3,7 @@ from ray.tune import Tuner
 from ray.rllib.algorithms.dqn import DQN
 from ray.rllib.algorithms.ppo import PPO
 
-import environment.environment_creator
+import environments.environment_creator
 
 if __name__ == '__main__':
     if ray.is_initialized():
