@@ -23,27 +23,38 @@ class CustomCNN(TorchModelV2, nn.Module):
         self.obs_shape = obs_space.shape
         self.num_outputs = num_outputs
 
-        dummy_input = torch.randn(self.obs_shape)
+        dummy_input = torch.randn((10, *self.obs_shape)).permute(0, 3, 1, 2)
 
         # Paramètres personnalisables
         self.conv_layers = model_config.get("conv_layers", [64, 32])  # Couches convolutives
-        self.kernel_sizes = model_config.get("kernel_sizes", [(3, 3), (2, 2)])  # Tailles des noyaux
-        self.fc_layers = model_config.get("fc_layers", [128])         # Couches fully connected
+        self.kernel_sizes = model_config.get("kernel_sizes", [(4, 4), ])  # Tailles des noyaux
+        self.fc_layers = model_config.get("fc_layers", [128, 128])         # Couches fully connected
         self.activation = model_config.get("activation", "relu")      # Fonction d'activation
 
-        # Couches convolutives
-        conv_layers = []
-        in_channels = self.obs_shape[0]
-        for out_channels, kernel_size in zip(self.conv_layers, self.kernel_sizes):
-            conv_layers.append(nn.Conv2d(in_channels, out_channels, kernel_size))
-            conv_layers.append(get_activation(self.activation))
-            in_channels = out_channels
+        # # Couches convolutives
+        # conv_layers = []
+        # in_channels = self.obs_shape[0]
+        # for out_channels, kernel_size in zip(self.conv_layers, self.kernel_sizes):
+        #     conv_layers.append(nn.Conv2d(in_channels, out_channels, kernel_size))
+        #     conv_layers.append(get_activation(self.activation))
+        #     in_channels = out_channels
+        #
+        # self.conv = nn.Sequential(*conv_layers)
 
-        self.conv = nn.Sequential(*conv_layers)
+        self.conv = nn.Sequential(*[
+            nn.Conv2d(4, 16, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            # nn.MaxPool2d(kernel_size=2, stride=2),
+            # nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            # nn.ReLU()
+        ])
 
         # Couches fully connected
         fc_layers = []
-        in_features = np.prod(self.conv(dummy_input).shape)
+        in_features = self.conv(dummy_input).flatten(start_dim=1).shape[1]
         for units in self.fc_layers:
             fc_layers.append(nn.Linear(in_features, units))
             fc_layers.append(get_activation(self.activation))
@@ -55,9 +66,10 @@ class CustomCNN(TorchModelV2, nn.Module):
         self.output_layer = nn.Linear(self.fc_layers[-1], num_outputs)
 
     def forward(self, input_dict, state, seq_lens):
-        x = input_dict["obs"].float()   # .float() / 255.0
+        x = input_dict["obs"].float()
+        x = x.permute(0, 3, 1, 2)
         x = self.conv(x)
-        x = x.view(x.size(0), -1)
+        x = x.flatten(start_dim=1)
         x = self.fc(x)
         output = self.output_layer(x)
         return output, state

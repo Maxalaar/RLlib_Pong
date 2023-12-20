@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.11 (RLlib_Pong)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="RLlib_Pong_Help_2" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="RLlib_Pong" project-jdk-type="Python SDK" />
 </project>

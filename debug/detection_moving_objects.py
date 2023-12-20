@@ -28,7 +28,7 @@ def motion_mask(frame, prev_gray):
     # Draw bounding boxes around motion areas
     for contour in contours:
         x, y, w, h = cv2.boundingRect(contour)
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 1)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 0), 1)
 
     # Update the previous frame
     prev_gray = gray.copy()
@@ -98,7 +98,7 @@ def threshold(frame, bg_subtractor):
     # Draw bounding boxes around moving objects
     for contour in contours:
         x, y, w, h = cv2.boundingRect(contour)
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 1)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 1)
 
     return frame
 

@@ -1,12 +1,12 @@
 import cv2
 import numpy as np
 
-from executables.approximate_policy_decision_trees import load_partial_data
+from executables.approximate_policy_decision_trees import load_data
 
 if __name__ == '__main__':
     # Assuming you have an array containing 100 images with a shape of (100, 84, 84, 4)
     # Replace this with your own array of images
-    observations, actions = load_partial_data(
+    observations, actions = load_data(
         '/ray_datasets/data_1.h5',
         0,
         1000,
