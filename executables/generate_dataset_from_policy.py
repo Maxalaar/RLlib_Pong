@@ -38,8 +38,8 @@ if __name__ == '__main__':
     data_frame_path: str = '/home/malaarabiou/Programming_Projects/Pycharm_Projects/RLlib_Pong/ray_datasets/' + 'data_1'
 
     # path_to_checkpoint: str = '/home/malaarabiou/Programming_Projects/Pycharm_Projects/RLlib_Pong/ray_results/PPO_2023-12-01_11-48-20/PPO_ALE_Pong-v5_24b2d_00000_0_2023-12-01_11-48-20/checkpoint_000930'
-    storage_directory: str = '/home/malaarabiou/Programming_Projects/Pycharm_Projects/RLlib_Pong/ray_results/PPO_2023-12-15_14-02-14'
-    tuner: Tuner = Tuner.restore(path=storage_directory, trainable=PPO)
+    policy_storage_directory: str = '/home/malaarabiou/Programming_Projects/Pycharm_Projects/RLlib_Pong/ray_results/PPO_2023-12-15_14-02-14'
+    tuner: Tuner = Tuner.restore(path=policy_storage_directory, trainable=PPO)
     result_grid = tuner.get_results()
     best_result = result_grid.get_best_result(metric='episode_reward_mean', mode='max')
     path_checkpoint: str = best_result.best_checkpoints[0][0].path
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     selected_eval_worker_ids = algorithm.evaluation_workers.healthy_worker_ids()
     all_batches = []
 
-    for i in range(500):
+    for i in range(100):
         batches = algorithm.evaluation_workers.foreach_worker(
             func=lambda w: w.sample(explore=False),
             local_worker=False,

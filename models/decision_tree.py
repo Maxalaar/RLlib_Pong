@@ -1,23 +1,39 @@
 from ray.rllib.policy import Policy
 
+import joblib
+import numpy as np
+from sklearn.tree import DecisionTreeClassifier
+
+from executables.approximate_policy_decision_trees import detection_moving_objects, display_image
+
 
 class DecisionTree(Policy):
     def __init__(self, observation_space, action_space, config):
         Policy.__init__(self, observation_space, action_space, config)
-        self.decision_tree = joblib.load(config['decision_tree_path'])
+        self.decision_tree: DecisionTreeClassifier = joblib.load(config['decision_tree_path'])
 
     def compute_actions(self, obs_batch, state_batches=None, prev_action_batch=None, prev_reward_batch=None, info_batch=None, episodes=None, **kwargs):
-        actions = []  # Liste pour stocker les actions calculées
 
-        # Logique pour calculer les actions basées sur l'observation
-        for obs in obs_batch:
-            # Effectuez des calculs spécifiques pour chaque observation
-            action = ...  # Calcul de l'action pour une observation donnée
-            actions.append(action)
+        # observations_moving_objects = []
+        # for obs in obs_batch:
+        #     observations_moving_objects.append(detection_moving_objects(obs))
+        # observations_moving_objects = np.array(observations_moving_objects)
 
-        return actions, [], {}  # Renvoyer les actions et d'autres informations nécessaires
+        display_image(obs_batch[0])
+
+        observations_moving_objects = obs_batch
+        observations_moving_objects = observations_moving_objects.reshape(observations_moving_objects.shape[0], -1)
+
+        actions = self.decision_tree.predict(observations_moving_objects)
+        # actions = np.array([self.action_space.sample()] * obs_batch.shape[0])
+
+        return actions, [], {}
 
     def learn_on_batch(self, samples):
-        # Implémentez la logique d'apprentissage ici si nécessaire
-        # Cette méthode est utilisée si votre politique prend en charge l'apprentissage
+        pass
+
+    def get_weights(self):
+        pass
+
+    def set_weights(self, weights):
         pass

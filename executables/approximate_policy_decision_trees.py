@@ -9,18 +9,21 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
 
 
-def load_data(path, number_steps=None, random=False):
+def load_data(path, number_steps=None, random=False, start_index=None, stop_index=None):
     with h5py.File(path, 'r') as hf:
-        if number_steps is not None and random == True:
+        if number_steps is not None and random is True:
             total_values = hf['observations'].shape[0]
             print('chose index')
             random_indices = np.random.choice(total_values, number_steps, replace=False)
             random_indices.sort()
             observations = hf['observations'][random_indices]
             actions = hf['actions'][random_indices]
-        elif number_steps is not None and random == False:
+        elif number_steps is not None and random is False:
             observations = hf['observations'][:number_steps]
             actions = hf['actions'][:number_steps]
+        elif start_index is not None and stop_index is not None:
+            observations = hf['observations'][start_index:stop_index]
+            actions = hf['actions'][start_index:stop_index]
         else:
             observations = hf['observations'][:]
             actions = hf['actions'][:]
@@ -33,6 +36,7 @@ def get_size_dataset(path) -> int:
 
 
 def detection_moving_objects(image):
+    image = image.transpose(2, 0, 1)
     # diff1 = cv2.absdiff(image[1], image[0])
     # diff2 = cv2.absdiff(image[2], image[1])
     diff3 = cv2.absdiff(image[3], image[2])
@@ -46,7 +50,7 @@ def detection_moving_objects(image):
     _, motion_mask = cv2.threshold(merged_diff, threshold, 255, cv2.THRESH_BINARY)
     contours, _ = cv2.findContours(motion_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    # image_to_draw = np.copy(image[3])
+    image_to_draw = np.copy(image[3])
     number_box = 8
     moving_objects_box = np.full((number_box, 4), -1)
 
@@ -61,20 +65,26 @@ def detection_moving_objects(image):
 
             # cv2.rectangle(image_to_draw, (x, y), (x + w, y + h), (0, 0, 0), 1)
 
-            # for contour in contours:
-    #     x, y, w, h = cv2.boundingRect(contour)
-    #     cv2.rectangle(image_to_draw, (x, y), (x + w, y + h), (0, 0, 0), 1)
+        # for contour in contours:
+        #     x, y, w, h = cv2.boundingRect(contour)
+        #     cv2.rectangle(image_to_draw, (x, y), (x + w, y + h), (0, 0, 0), 1)
 
-    # cv2.namedWindow('Image', cv2.WINDOW_NORMAL)
-    # cv2.imshow('Image', image_to_draw)
-    # cv2.waitKey(50)
+    cv2.namedWindow('Image', cv2.WINDOW_NORMAL)
+    cv2.imshow('Image', image_to_draw)
+    cv2.waitKey(50)
     # cv2.destroyAllWindows()
 
     return moving_objects_box
 
 
+def display_image(image):
+    cv2.namedWindow('Image', cv2.WINDOW_NORMAL)
+    cv2.imshow('Image', image)
+    cv2.waitKey(10)
+
+
 def learning(X_train, X_test, y_train, y_test, max_depth=None, min_samples_leaf=1, min_samples_split=2):
-    decision_tree_classifier = DecisionTreeClassifier(max_depth=max_depth, min_samples_leaf=min_samples_leaf,
+    decision_tree_classifier : DecisionTreeClassifier = DecisionTreeClassifier(max_depth=max_depth, min_samples_leaf=min_samples_leaf,
                                                       min_samples_split=min_samples_split)
     decision_tree_classifier.fit(X_train, y_train)
 
@@ -98,28 +108,34 @@ def find_sequence_indices(tableau, sequence):
 
 
 if __name__ == '__main__':
-    datasets_path = './ray_datasets/data_1.h5'
+    datasets_path = './ray_datasets/refine_data_1.h5'
     directory = './sklearn_tree_classifier/'
     model_filename = 'decision_tree_classifier.pkl'
     print('dataset size : ' + str(get_size_dataset(datasets_path)))
 
     # for i in range(1000):
-    observations, actions = load_data(datasets_path)
+    observations, actions = load_data(datasets_path, 600_000)
     print('data load')
-    observations = observations.transpose(0, 3, 1, 2)
+
+
+
+    # for observation in observations:
+    #     display_image(observation)
 
     # observations = observations.reshape(observations.shape[0], -1)
 
-    observations_moving_objects = []
-    for i in range(observations.shape[0]):
-        observations_moving_objects.append(detection_moving_objects(observations[i]))
-    observations_moving_objects = np.array(observations_moving_objects)
+    # observations_moving_objects = []
+    # for i in range(observations.shape[0]):
+    #     observations_moving_objects.append(detection_moving_objects(observations[i]))
+    # observations_moving_objects = np.array(observations_moving_objects)
+    # print('processes obs')
+
+    observations_moving_objects = observations
     observations_moving_objects = observations_moving_objects.reshape(observations_moving_objects.shape[0], -1)
-    print('processes obs')
 
-    X_train, X_test, y_train, y_test = train_test_split(observations_moving_objects, actions, test_size=0.2)
+    X_train, X_test, y_train, y_test = train_test_split(observations_moving_objects, actions, test_size=0.1)
 
-    decision_tree_classifier = learning(X_train, X_test, y_train, y_test)
+    decision_tree_classifier = learning(X_train, X_test, y_train, y_test, max_depth=None, min_samples_leaf=1, min_samples_split=2)
 
     if not os.path.exists(directory):
         os.makedirs(directory)
